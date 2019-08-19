@@ -34,6 +34,31 @@ class HeroController extends Controller
         return json_encode($herosList);
     }
 
+    public function home()
+    {
+        $res = $this->client->get('https://akabab.github.io/superhero-api/api/all.json');
+        $herosList = json_decode($res->getBody()->getContents());
+
+        foreach ($herosList as $k => $hero) {
+            $power = $this->getPower($hero);
+            $herosList[$k]->powerstats->avg = $power['avg'];
+            $herosList[$k]->powerstats->sum = $power['sum'];
+
+            $rarity = $this->getRarity($hero);
+            $herosList[$k]->rarity = $rarity['rarity'];
+            $herosList[$k]->color = $rarity['color'];
+        }
+
+        $selected = array_rand($herosList, 30);
+        shuffle($selected);
+        $result = [];
+        foreach ($selected as $id) {
+            $result[] = $herosList[$id];
+        }
+
+        return json_encode($result);
+    }
+
     public function detail($id)
     {
         $res = $this->client->get('https://akabab.github.io/superhero-api/api/id/' . $id . '.json');

@@ -17,4 +17,5 @@ $router->get('/', function () use ($router) {
 
 // Heros routes
 $router->get('heros', 'HeroController@show');
+$router->get('heros/home', 'HeroController@home');
 $router->get('heros/{id}', 'HeroController@detail');

@@ -29,21 +29,10 @@ class HeroController extends Controller
 
     public function home()
     {
-        $res = $this->client->get('https://akabab.github.io/superhero-api/api/all.json');
-        $herosList = json_decode($res->getBody()->getContents());
-
-        foreach ($herosList as $k => $hero) {
-            $power = $this->getPower($hero);
-            $herosList[$k]->powerstats->avg = $power['avg'];
-            $herosList[$k]->powerstats->sum = $power['sum'];
-
-            $rarity = $this->getRarity($hero);
-            $herosList[$k]->rarity = $rarity['rarity'];
-            $herosList[$k]->color = $rarity['color'];
-        }
-
+        $herosList = Hero::with('powerstats', 'biography')->get()->toArray();
         $selected = array_rand($herosList, 30);
         shuffle($selected);
+
         $result = [];
         foreach ($selected as $id) {
             $result[] = $herosList[$id];
@@ -54,16 +43,7 @@ class HeroController extends Controller
 
     public function detail($id)
     {
-        $res = $this->client->get('https://akabab.github.io/superhero-api/api/id/' . $id . '.json');
-        $hero = json_decode($res->getBody()->getContents());
-
-        $power = $this->getPower($hero);
-        $hero->powerstats->avg = $power['avg'];
-        $hero->powerstats->sum = $power['sum'];
-
-        $rarity = $this->getRarity($hero);
-        $hero->rarity = $rarity['rarity'];
-        $hero->color = $rarity['color'];
+        $hero = Hero::with('powerstats', 'biography')->find($id);
 
         return json_encode($hero);
     }
@@ -71,63 +51,9 @@ class HeroController extends Controller
     public function search(Request $request)
     {
         $search = $request->input('search');
-        dump($search);
-        die();
 
-        $res = $this->client->get('https://akabab.github.io/superhero-api/api/all.json');
-        $herosList = json_decode($res->getBody()->getContents());
+        $heros = Hero::where('Name', 'like', "%{$search}%")->with('powerstats', 'biography')->get();
 
-        foreach ($herosList as $k => $hero) {
-            $power = $this->getPower($hero);
-            $herosList[$k]->powerstats->avg = $power['avg'];
-            $herosList[$k]->powerstats->sum = $power['sum'];
-
-            $rarity = $this->getRarity($hero);
-            $herosList[$k]->rarity = $rarity['rarity'];
-            $herosList[$k]->color = $rarity['color'];
-        }
-        return json_encode($herosList);
-    }
-
-    private function getPower($hero)
-    {
-        $sum = $hero->powerstats->intelligence +
-            $hero->powerstats->strength +
-            $hero->powerstats->speed +
-            $hero->powerstats->durability +
-            $hero->powerstats->power +
-            $hero->powerstats->combat;
-        $avg = $sum / 6;
-
-        return ['avg' => round($avg), 'sum' => $sum];
-    }
-
-    private function getRarity($hero)
-    {
-        switch (true) {
-            case $hero->powerstats->avg < 71:
-                $rarity = 1;
-                $color = 'common';
-                break;
-            case $hero->powerstats->avg < 81:
-                $rarity = 2;
-                $color = 'rare';
-                break;
-            case $hero->powerstats->avg < 91:
-                $rarity = 3;
-                $color = 'epic';
-                break;
-            case $hero->powerstats->avg > 90:
-                $rarity = 4;
-                $color = 'legendary';
-                break;
-
-            default:
-                $rarity = 1;
-                $color = 'common';
-                break;
-        }
-
-        return ['rarity' => $rarity, 'color' => $color];
+        return json_encode($heros);
     }
 }

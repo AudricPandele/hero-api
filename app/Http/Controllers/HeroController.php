@@ -93,24 +93,24 @@ class HeroController extends Controller
         switch (true) {
             case $hero->powerstats->avg < 71:
                 $rarity = 1;
-                $color = '#3498db';
+                $color = 'common';
                 break;
             case $hero->powerstats->avg < 81:
                 $rarity = 2;
-                $color = '#b08d57';
+                $color = 'rare';
                 break;
             case $hero->powerstats->avg < 91:
                 $rarity = 3;
-                $color = '#bec2cb';
+                $color = 'epic';
                 break;
             case $hero->powerstats->avg > 90:
                 $rarity = 4;
-                $color = '#ffd700';
+                $color = 'legendary';
                 break;
 
             default:
                 $rarity = 1;
-                $color = '#3498db';
+                $color = 'common';
                 break;
         }
 

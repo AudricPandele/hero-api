@@ -19,3 +19,4 @@ $router->get('/', function () use ($router) {
 $router->get('heros', 'HeroController@show');
 $router->get('heros/home', 'HeroController@home');
 $router->get('heros/{id}', 'HeroController@detail');
+$router->post('heros', 'HeroController@search');

@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Hero;
+use App\Powerstats;
+use App\Biography;
 use GuzzleHttp\Client as Guzzle;
+use Illuminate\Http\Request;
 
 class HeroController extends Controller
 {
@@ -19,18 +23,7 @@ class HeroController extends Controller
 
     public function show()
     {
-        $res = $this->client->get('https://akabab.github.io/superhero-api/api/all.json');
-        $herosList = json_decode($res->getBody()->getContents());
-
-        foreach ($herosList as $k => $hero) {
-            $power = $this->getPower($hero);
-            $herosList[$k]->powerstats->avg = $power['avg'];
-            $herosList[$k]->powerstats->sum = $power['sum'];
-
-            $rarity = $this->getRarity($hero);
-            $herosList[$k]->rarity = $rarity['rarity'];
-            $herosList[$k]->color = $rarity['color'];
-        }
+        $herosList = Hero::with('powerstats', 'biography')->get();
         return json_encode($herosList);
     }
 
@@ -73,6 +66,27 @@ class HeroController extends Controller
         $hero->color = $rarity['color'];
 
         return json_encode($hero);
+    }
+
+    public function search(Request $request)
+    {
+        $search = $request->input('search');
+        dump($search);
+        die();
+
+        $res = $this->client->get('https://akabab.github.io/superhero-api/api/all.json');
+        $herosList = json_decode($res->getBody()->getContents());
+
+        foreach ($herosList as $k => $hero) {
+            $power = $this->getPower($hero);
+            $herosList[$k]->powerstats->avg = $power['avg'];
+            $herosList[$k]->powerstats->sum = $power['sum'];
+
+            $rarity = $this->getRarity($hero);
+            $herosList[$k]->rarity = $rarity['rarity'];
+            $herosList[$k]->color = $rarity['color'];
+        }
+        return json_encode($herosList);
     }
 
     private function getPower($hero)

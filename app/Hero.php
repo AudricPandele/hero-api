@@ -31,4 +31,13 @@ class Hero extends Model
     {
         return $this->hasOne('App\Biography');
     }
+
+    /*
+   * Get Users of Hero
+   *
+   */
+    public function users()
+    {
+        return $this->belongsToMany('App\User')->withTimestamps();
+    }
 }

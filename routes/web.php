@@ -16,6 +16,8 @@ $router->get('/', function () use ($router) {
 });
 
 // Heros routes
+$router->post('/auth/login/', 'UsersController@authenticate');
+$router->post('/auth/register/', 'UsersController@register');
 $router->get('heros', 'HeroController@show');
 $router->get('heros/home', 'HeroController@home');
 $router->get('heros/{id}', 'HeroController@detail');

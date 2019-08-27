@@ -19,6 +19,7 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique()->nullable();
             $table->string('password')->nullable();
             $table->string('api_key')->nullable();
+            $table->integer('heroPoints')->default(100);
             $table->timestamps();
         });
     }

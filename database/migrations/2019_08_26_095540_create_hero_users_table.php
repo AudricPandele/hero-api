@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateUserHeroTable extends Migration
+class CreateHeroUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class CreateUserHeroTable extends Migration
      */
     public function up()
     {
-        Schema::create('user_hero', function (Blueprint $table) {
+        Schema::create('hero_users', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('user_id')->unsigned()->nullable();
-            $table->foreign('user_id')->references('id')
+            $table->integer('users_id')->unsigned()->nullable();
+            $table->foreign('users_id')->references('id')
                 ->on('users')->onDelete('cascade');
 
             $table->integer('hero_id')->unsigned()->nullable();

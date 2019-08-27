@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Hero;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
@@ -29,7 +30,7 @@ class UsersController extends Controller
         if (Hash::check($request->input('password'), $user->password)) {
             $apikey = base64_encode(str_random(40));
             Users::where('email', $request->input('email'))->update(['api_key' => "$apikey"]);;
-            return response()->json(['status' => 'success', 'user' => $user]);
+            return response()->json(['status' => 'success', 'user' => Users::with('heros')->find($user->id)]);
         } else {
             return response()->json(['status' => 'fail'], 401);
         }
@@ -42,10 +43,23 @@ class UsersController extends Controller
      */
     public function register(Request $request)
     {
-        return Users::create([
+        $newUser = Users::create([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
             'password' => Hash::make($request->input('password')),
         ]);
+
+        $newHeroId = rand(1, 563);
+        $newHero = Hero::find($newHeroId);
+        $newUser->heros()->save($newHero);
+
+        return $newUser;
+    }
+
+    public function detail($id)
+    {
+        $user = Users::with('heros')->find($id);
+
+        return json_encode($user);
     }
 }
